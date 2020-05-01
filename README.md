@@ -1,4 +1,4 @@
-# Mails versenden via ArduinoUno
+# Mails versenden via Arduino Uno
 
 In diesem Repository findest du den Code, um mit einem Arduino Uno, einem Netzwerk-Shield und Onlex Emails zu versenden. In diesem Blog-Artikel erhältst du weitere Infos über das Projekt: 
 
