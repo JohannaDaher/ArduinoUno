@@ -1,0 +1,74 @@
+// *****************************************************************
+// Hardware: Arduino Uno mit Netzwerk-Shield - HANrun
+// Basiert auf https://www.arduino.cc/en/Tutorial/WebClient
+// created 18 Dec 2009 by David A. Mellis 
+// modified 9 Apr 2012 by Tom Igoe, based on work by Adrian McEwen
+// Anwendung für Formmailer - Dienst Onlex April 2020 by Georg Daher
+//
+// Aufgabe: Senden einer Störmeldung via E-Mail 
+// mit dem Arduino Uno über einen Formmailerdienst
+//          
+// *******************************************************************
+#include <SPI.h>
+#include <Ethernet.h>
+
+byte MAC[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; // MAC Arduino
+char server[] = "www.onlex.de";             
+                                            
+IPAddress ip(192, xxx,xxx, xxx);    // IP Arduino
+IPAddress myDns(192, xxx, xx,xx);   // Lokaler DNS (Router)
+
+EthernetClient client;                               
+
+void setup() {
+  delay(800);                                        
+  Serial.begin(9600);
+  Serial.println("Start Verbindung ...");
+  if (Ethernet.begin(MAC) == 0) 
+   {
+    Serial.println("DHCP Verbindung fehlgeschlagen Teste local DNS...");
+     if (Ethernet.hardwareStatus() == EthernetNoHardware) 
+      {
+       Serial.println("Hardwareproblem ...");
+       while (true) {
+          delay(42);                            // Nirvana ...
+         }
+      }    
+     Ethernet.begin(MAC, ip, myDns);                  
+   } 
+   else 
+   {
+    Serial.print("IP des Servers: ");
+    Serial.println(Ethernet.localIP());
+  }
+  
+  delay(1000);                      
+  Serial.print("Verbindungsaufbau zu:");
+    Serial.println(server);    
+  if (client.connect(server, 80)) {
+    Serial.print("Verbunden mit: ");
+     Serial.println(client.remoteIP());
+     // Send Data - Simulation Senden eines Formulars 
+     // via Formmailerdienst durch Arduino -
+     // Metode POST > die Längenangabe der Daten und 
+     // die 2 \r\n bzw. println's sind notwendig 
+        client.println("POST /_formmailer.php?username=XXXXXXX HTTP/1.1");    
+        client.println("Host: www.onlex.de");
+        client.println("Content-Type: application/x-www-form-urlencoded"); 
+        client.println("Content-Length: 19"); // 1. \r\n Name+TestWert+CR=13
+        client.println();                     // 2. \r\n
+        client.print("MSG=Heizung_Ausfall");  // Felddaten senden
+        delay (100);                          // etwas warten
+        client.stop();                        // und fertig :-)
+        Serial.print("Meldung gesendet, Verbindung gestoppt ..."); 
+  } else {    
+        Serial.println("Verbindung fehlgeschlagen");
+  } 
+}
+// **************************************** MAIN ******************************
+void loop() {
+ 			// NIX zu tun .... in dem Fall ...
+ delay(2000);
+}
+
+
